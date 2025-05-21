@@ -1,4 +1,5 @@
 import { onAuthenticate } from "@/actions/auth";
+import Sidebar from "@/components/ReusableComponents/LayoutComponents/Sidebar";
 import { redirect } from "next/navigation";
 
 type Props = {
@@ -13,6 +14,8 @@ const Layout = async ({ children }: Props) => {
   }
   return (
     <div className="flex w-full min-h-screen">
+
+      <Sidebar />
       <div className="flex flex-col w-full h-screen overflow-auto px-4 scrollbar-hide container mx-auto">
         {children}
       </div>
