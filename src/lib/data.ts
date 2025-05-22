@@ -1,4 +1,5 @@
-import { HomeIcon, Settings2Icon, Sparkle, Webcam } from "lucide-react";
+import { CallStatusEnum } from "@prisma/client";
+import { HomeIcon, Settings2Icon, Sparkle, User, Webcam } from "lucide-react";
 export const sidebarData = [
   {
     id: 1,
@@ -15,7 +16,7 @@ export const sidebarData = [
   {
     id: 3,
     title: "Leads",
-    icon: LeadIcon,
+    icon: User,
     link: "/lead",
   },
   {
@@ -33,56 +34,56 @@ export const sidebarData = [
   },
 ];
 
-// export const onBoardingSteps = [
-//   { id: 1, title: "Create a webinar", complete: false, link: "" },
-//   { id: 2, title: "Get leads", complete: false, link: "" },
-//   { id: 3, title: "Conversion status", complete: false, link: "" },
-// ];
+export const onBoardingSteps = [
+  { id: 1, title: "Create a webinar", complete: false, link: "" },
+  { id: 2, title: "Get leads", complete: false, link: "" },
+  { id: 3, title: "Conversion status", complete: false, link: "" },
+];
 
-// export const potentialCustomer = [
-//   {
-//     id: "1",
-//     name: "John Doe",
-//     email: "Johndoe@gmail.com",
-//     clerkId: "1",
-//     profileImage: "/vercel.svg",
-//     isActive: true,
-//     lastLoginAt: null,
-//     createdAt: new Date(),
-//     updatedAt: new Date(),
-//     deletedAt: null,
-//     tags: ["New", "Hot Lead"],
-//     callStatus: CallStatusEnum.COMPLETED,
-//   },
-//   {
-//     id: "2",
-//     name: "John Doe",
-//     email: "Johndoe@gmail.com",
-//     clerkId: "2",
-//     profileImage: "/vercel.svg",
-//     isActive: true,
-//     lastLoginAt: null,
-//     createdAt: new Date(),
-//     updatedAt: new Date(),
-//     deletedAt: null,
-//     tags: ["New", "Hot Lead"],
-//     callStatus: CallStatusEnum.COMPLETED,
-//   },
-//   {
-//     id: "3",
-//     name: "John Doe",
-//     email: "Johndoe@gmail.com",
-//     clerkId: "3",
-//     profileImage: "/vercel.svg",
-//     isActive: true,
-//     lastLoginAt: null,
-//     createdAt: new Date(),
-//     updatedAt: new Date(),
-//     deletedAt: null,
-//     tags: ["New", "Hot Lead"],
-//     callStatus: CallStatusEnum.COMPLETED,
-//   },
-// ];
+export const potentialCustomer = [
+  {
+    id: "1",
+    name: "Sonam Bajwa",
+    email: "sonam@gmail.com",
+    clerkId: "1",
+    profileImage: "/vercel.svg",
+    isActive: true,
+    lastLoginAt: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    deletedAt: null,
+    tags: ["New", "Hot Lead"],
+    callStatus: CallStatusEnum.COMPLETED,
+  },
+  {
+    id: "2",
+    name: "Sydney Sweeney",
+    email: "sydney@gmail.com",
+    clerkId: "2",
+    profileImage: "/vercel.svg",
+    isActive: true,
+    lastLoginAt: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    deletedAt: null,
+    tags: ["New", "Hot Lead"],
+    callStatus: CallStatusEnum.COMPLETED,
+  },
+  {
+    id: "3",
+    name: "Ana De Armas",
+    email: "ana@gmail.com",
+    clerkId: "3",
+    profileImage: "/vercel.svg",
+    isActive: true,
+    lastLoginAt: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    deletedAt: null,
+    tags: ["New", "Hot Lead"],
+    callStatus: CallStatusEnum.COMPLETED,
+  },
+];
 
 // export const subscriptionPriceId = `price_1RLtR0Fj9oKEERu1zShQbtgG`;
 
