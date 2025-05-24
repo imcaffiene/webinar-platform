@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { set } from 'date-fns';
 import { createWebinar } from '@/actions/webinar';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 type Step = {
   id: string;
@@ -63,6 +64,11 @@ const MultiStepForm = ({ steps, onComplete }: Props) => {
       try {
         setSubmitting(true);
         const res = await createWebinar(formData);
+
+        if (res.status === 200 && res.webinarId) {
+          toast.success('Webinar created successfully');
+          onComplete(res.webinarId);
+        }
 
       } catch (error) { }
     } else {
