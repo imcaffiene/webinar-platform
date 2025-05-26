@@ -3,7 +3,7 @@
 import { useWebinarStore } from '@/store/useWebinarStore';
 import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { AlertCircle, Check } from 'lucide-react';
+import { AlertCircle, Check, ChevronRight, Loader2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -68,9 +68,19 @@ const MultiStepForm = ({ steps, onComplete }: Props) => {
         if (res.status === 200 && res.webinarId) {
           toast.success('Webinar created successfully');
           onComplete(res.webinarId);
+        } else {
+          toast.error(res.message || 'Failed to create webinar');
+          setValidationErrors(res.message);
         }
+        router.refresh();
 
-      } catch (error) { }
+      } catch (error) {
+        console.error('Error creating webinar:', error);
+        toast.error('An error occurred while creating the webinar');
+        setValidationErrors('An error occurred while creating the webinar');
+      } finally {
+        setSubmitting(false);
+      }
     } else {
       setCurrentStepIndex(currentStepIndex + 1);
     }
@@ -208,6 +218,23 @@ const MultiStepForm = ({ steps, onComplete }: Props) => {
         >
           {isFirstStep ? 'Cancel' : 'Back'}
         </Button>
+
+        <Button
+          onClick={handleNext}
+          disabled={isSubmitting}
+        >
+          {isLastStep ? (
+            isSubmitting ? (
+              <>
+                <Loader2 className='animate-spin ' />
+                Creating...
+              </>
+            ) : ('Complete')
+          ) : ('Next')
+          }
+          {!isLastStep && <ChevronRight className='ml-1 h-4 w-4' />}
+        </Button>
+
       </div>
     </div>
   );

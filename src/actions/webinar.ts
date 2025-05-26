@@ -38,7 +38,7 @@ export const createWebinar = async (formData: WebinarFormState) => {
 
     const presenterId = user.user.id;
 
-    console.log("Form Data:", formData, presenterId);
+    // console.log("Form Data:", formData, presenterId);
 
     if (!formData.basicInfo.webinarName) {
       return {
@@ -109,5 +109,28 @@ export const createWebinar = async (formData: WebinarFormState) => {
       status: 500,
       message: "Failed to create webinar",
     };
+  }
+};
+
+export const getWebinarByPresenterId = async (presenterId: string) => {
+  try {
+    const webinars = await prismaClient.webinar.findMany({
+      where: {
+        presenterId,
+      },
+      include: {
+        presenter: {
+          select: {
+            name: true,
+            id: true,
+            stripeConnectId: true,
+          },
+        },
+      },
+    });
+    return webinars;
+  } catch (error) {
+    console.error("Error fetching webinars by presenter ID:", error);
+    return [];
   }
 };
