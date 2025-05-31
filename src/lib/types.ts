@@ -1,4 +1,4 @@
-import { Attendee, Webinar, User } from "@prisma/client";
+import { Attendee, Webinar, User, CallStatusEnum } from "@prisma/client";
 
 export type ValidationErrors = Record<string, string>;
 
@@ -86,7 +86,14 @@ export const validateAdditionalInfo = (data: {
 
 export type AttendanceData = {
   count: number;
-  users: Attendee[];
+  users: {
+    id: string;
+    name: string;
+    email: string;
+    joinedAt: Date;
+    stripeConnectId: string | null;
+    callStatus: CallStatusEnum;
+  }[];
 };
 
 export type WebinarWithPresenter = Webinar & {

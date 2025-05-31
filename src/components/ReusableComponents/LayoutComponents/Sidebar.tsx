@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useEffect, useState } from 'react';
 import { usePathname } from "next/navigation";
 import SpotlightIcon from "../Logo/SpotlightIcon";
 import { sidebarData } from "@/lib/data";
@@ -9,7 +10,22 @@ import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
 
 const Sidebar = () => {
-  const pathName = usePathname();
+  const [mounted, setMounted] = useState(false);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div className="w-18 sm:w-28 h-screen sticky top-0 py-10 px-2 sm:px-6 border bg-background border-border flex flex-col items-center justify-start gap-10">
+        <div className="mb-10">
+          <SpotlightIcon />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-18 sm:w-28 h-screen sticky top-0 py-10 px-2 sm:px-6 border bg-background border-border flex flex-col items-center justify-start gap-10">
@@ -23,10 +39,15 @@ const Sidebar = () => {
             <TooltipProvider key={item.id}>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Link href={item.link}
-                    className={`flex items-center gap-2 cursor-pointer rounded-lg p-2 ${pathName.includes(item.link) ? 'iconBackground' : ''}`}>
-
-                    <item.icon className={`w-4 h-4 ${pathName.includes(item.link) ? '' : 'opacity-80'}`} />
+                  <Link
+                    href={item.link}
+                    className={`flex items-center gap-2 cursor-pointer rounded-lg p-2 ${pathname?.includes(item.link) ? 'iconBackground' : ''
+                      }`}
+                  >
+                    <item.icon
+                      className={`w-4 h-4 ${pathname?.includes(item.link) ? '' : 'opacity-80'
+                        }`}
+                    />
                   </Link>
                 </TooltipTrigger>
                 <TooltipContent side="right">
@@ -39,8 +60,8 @@ const Sidebar = () => {
 
         <UserButton />
       </div>
-
     </div>
   );
 };
+
 export default Sidebar;
