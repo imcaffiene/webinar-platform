@@ -1,3 +1,4 @@
+import DashboardNavBar from "@/components/pages/dashboard/DashboardNavBar";
 import DashBoardSidebar from "@/components/pages/dashboard/DashBoardSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 
@@ -10,9 +11,11 @@ const DashBoardLayout = ({ children }: Props) => {
     <SidebarProvider>
       <DashBoardSidebar />
       <main className="flex flex-col h-screen w-screen bg-mutated">
+        <DashboardNavBar />
         {children}
       </main>
     </SidebarProvider>
   );
 };
+
 export default DashBoardLayout;
