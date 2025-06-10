@@ -8,15 +8,16 @@ datasource db {
 }
 
 model User {
-  id            String    @id
-  name          String
+  id            String    @id @default(nanoid())
+  name          String    @db.VarChar(255)
   email         String
-  emailVerified Boolean
-  image         String?
-  createdAt     DateTime
-  updatedAt     DateTime
+  emailVerified Boolean   @default(false)
+  image         String?   @db.VarChar(512)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @default(now())
   sessions      Session[]
   accounts      Account[]
+  Agent         Agent[]
 
   @@unique([email])
   @@map("user")
@@ -34,6 +35,7 @@ model Session {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([token])
+  @@index([userId, expiresAt])
   @@map("session")
 }
 
@@ -53,6 +55,8 @@ model Account {
   createdAt             DateTime
   updatedAt             DateTime
 
+  @@unique([accountId, providerId])
+  @@index([userId])
   @@map("account")
 }
 
@@ -65,4 +69,17 @@ model Verification {
   updatedAt  DateTime?
 
   @@map("verification")
+}
+
+model Agent {
+  id           String   @id @default(nanoid())
+  name         String   @db.VarChar(255)
+  instructions String   @db.Text
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("agents")
 }

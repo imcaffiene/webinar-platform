@@ -121,3 +121,14 @@
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes explode {
+  0% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(var(--tx) * 20px), calc(var(--ty) * 20px));
+    opacity: 0;
+  }
+}

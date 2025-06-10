@@ -1,4 +1,4 @@
-import HomePage from "@/components/pages/home/HomePage";
+import HomePage from "@/components/modules/home/HomePage";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";

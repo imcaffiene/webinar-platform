@@ -1,4 +1,4 @@
-import SignUpView from '@/components/pages/auth/SignUpPage';
+import SignUpView from '@/components/modules/auth/SignUpPage';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';

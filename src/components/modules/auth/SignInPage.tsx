@@ -1,6 +1,6 @@
 'use client';
 
-import SpotlightLogo from '@/components/icons/SpotlightLogo';
+import SpotlightLogo from '@/components/common/SpotlightLogo';
 import { Alert, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -19,17 +19,13 @@ import { FaGoogle, FaGithub } from "react-icons/fa";
 
 
 
+
 const formSchema = z.object({
-  name: z.string().min(1, { message: 'Name is required' }),
   email: z.string().email(),
   password: z.string().min(1, { message: 'Password is required' }),
-  confirmPassword: z.string().min(1, { message: 'Password is required' })
-}).refine((value) => value.password === value.confirmPassword, {
-  message: "Password don't match",
-  path: ['confirmPassword']
 });
 
-const SignUpView = () => {
+const SignInView = () => {
 
   const router = useTransitionRouter();
 
@@ -39,10 +35,8 @@ const SignUpView = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: '',
       email: '',
       password: '',
-      confirmPassword: ''
     }
   });
 
@@ -51,9 +45,8 @@ const SignUpView = () => {
     setError(null);
     setPending(true);
 
-    authClient.signUp.email(
+    authClient.signIn.email(
       {
-        name: value.name,
         email: value.email,
         password: value.password,
         callbackURL: '/'
@@ -80,7 +73,6 @@ const SignUpView = () => {
       {
         provider: provider,
         callbackURL: '/'
-
       },
       {
         onSuccess: () => {
@@ -104,31 +96,11 @@ const SignUpView = () => {
               <div className='flex flex-col gap-6'>
                 <div className='flex flex-col items-center text-center'>
                   <h1 className='text-2xl font-bold'>
-                    Let&apos;s get started
+                    Welcome Back
                   </h1>
                   <p className='text-muted-foreground text-balance'>
-                    Create your account
+                    Sign in to your account
                   </p>
-                </div>
-
-                <div className='grid gap-3'>
-                  <FormField
-                    control={form.control}
-                    name='name'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            type='text'
-                            placeholder='Name'
-                            className='w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500'
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
                 </div>
 
                 <div className='grid gap-3'>
@@ -171,26 +143,6 @@ const SignUpView = () => {
                   />
                 </div>
 
-                <div className='grid gap-3'>
-                  <FormField
-                    control={form.control}
-                    name='confirmPassword'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            type='password'
-                            placeholder='Confirm Password'
-                            className='w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500'
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
                 {!!error && (
                   <Alert className='bg-destructive/10 border-none'>
                     <OctagonAlertIcon className='h-4 w-4 !text-destructive' />
@@ -202,7 +154,7 @@ const SignUpView = () => {
                   disabled={pending}
                   type='submit'
                   className='w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-md transition-colors duration-200'>
-                  Sign Up
+                  Sign In
                 </Button>
                 <div className='after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t'>
                   <span className='bg-card text-muted-foreground relative z-10 px-2'>
@@ -232,9 +184,9 @@ const SignUpView = () => {
                 </div>
 
                 <div className='text-center text-sm text-muted-foreground'>
-                  Already have an account?{" "}
-                  <Link href={"/sign-in"} className='underline underline-offset-4'>
-                    Sign In
+                  Don&apos;t have an account?{" "}
+                  <Link href={"/sign-up"} className='underline underline-offset-4'>
+                    Sign up
                   </Link>
                 </div>
               </div>
@@ -249,11 +201,11 @@ const SignUpView = () => {
       </Card>
 
       <div className='text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4'>
-        By clicking  continue, you agree to our <Link href="/terms" className='underline underline-offset-4'>Terms of Service</Link> and <Link href="/privacy" className='underline underline-offset-4'>Privacy Policy</Link>.
+        By clicking  continue, you agree to our <Link href="#" className='underline underline-offset-4'>Terms of Service</Link> and <Link href="#" className='underline underline-offset-4'>Privacy Policy</Link>.
       </div>
     </div>
 
   );
 };
 
-export default SignUpView;
+export default SignInView;
