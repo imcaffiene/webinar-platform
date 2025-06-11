@@ -1,16 +1,16 @@
 'use client';
 
-import SpotlightLogo from '@/components/common/SpotlightLogo';
-import VideoIcon from '@/components/common/VideoIcon';
-import BotIcon from '@/components/common/BotIcon';
-import StarIcon from '@/components/common/StarIcon';
-import { Link } from 'next-view-transitions';
+import SpotlightLogo from '@/components/icons/SpotlightLogo';
+import VideoIcon from '@/components/icons/VideoIcon';
+import BotIcon from '@/components/icons/BotIcon';
+import StarIcon from '@/components/icons/StarIcon';
 import React, { use } from 'react';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarHeader, SidebarMenu, SidebarMenuButton } from '@/components/ui/sidebar';
 import DashboardUserButton from './DashboardUserButton';
+import Link from 'next/link';
 
 
 

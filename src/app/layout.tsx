@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/provider/theme-provider";
-import { ViewTransitions } from 'next-view-transitions';
 import { TRPCReactProvider } from "@/trpc/client";
-import SpotlightIcon from "@/components/common/SpotlightIcon";
+import { Toaster } from "@/components/ui/sonner";
 
 
 const geistSans = Geist({
@@ -30,22 +29,21 @@ export default function RootLayout({
 }>) {
   return (
     <TRPCReactProvider>
-      <ViewTransitions>
-        <html lang="en" suppressHydrationWarning>
-          <body
-            className={`${geistSans.variable} ${geistMono.variable} antialiased `}
+      <html lang="en" suppressHydrationWarning>
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased `}
+        >
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
           >
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-            >
-              {children}
-            </ThemeProvider>
-          </body>
-        </html>
-      </ViewTransitions>
+            <Toaster />
+            {children}
+          </ThemeProvider>
+        </body>
+      </html>
     </TRPCReactProvider>
   );
 }

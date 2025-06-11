@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import { baseProcedure } from "@/trpc/init";
+import { baseProcedure, protectedProcedure } from "@/trpc/init";
+import { agentInsertSchema } from "../schema/schema";
 import { TRPCError } from "@trpc/server";
 
 export const agentsRouter = {
@@ -18,14 +19,36 @@ export const agentsRouter = {
         createdAt: "desc",
       },
     });
-
-    // await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate a delay
-
-    // throw new TRPCError({
-    //   code: "INTERNAL_SERVER_ERROR",
-    //   message: "An error occurred while fetching agents.",
-    // });
-
     return data;
   }),
+
+  create: protectedProcedure
+    .input(agentInsertSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const createdAgent = await prisma.agent.create({
+          data: {
+            name: input.name,
+            instructions: input.instructions,
+            userId: ctx.auth.user.id,
+          },
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+          },
+        });
+        return createdAgent;
+      } catch (error) {
+        console.error("Agent creation failed:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create agent",
+        });
+      }
+    }),
 };

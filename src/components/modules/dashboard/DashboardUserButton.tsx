@@ -1,23 +1,23 @@
 'use client';
 
 import { GeneratedAvatar } from '@/components/generated-avatar';
-import CreditCardIcon from '@/components/common/CreditCardIcon';
-import LogOutIcon from '@/components/common/LogOutIcon';
-import SparklesIcon from '@/components/common/SparklesIcon';
+import CreditCardIcon from '@/components/icons/CreditCardIcon';
+import LogOutIcon from '@/components/icons/LogOutIcon';
+import SparklesIcon from '@/components/icons/SparklesIcon';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Drawer, DrawerTrigger } from '@/components/ui/drawer';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useSidebar } from '@/components/ui/sidebar';
 import { authClient } from '@/lib/auth-client';
 import { ChevronsUpDown } from 'lucide-react';
-import { useTransitionRouter } from 'next-view-transitions';
+import { useRouter } from 'next/navigation';
 
 
 const DashboardUserButton = () => {
 
   const { data, isPending } = authClient.useSession();
   const { isMobile } = useSidebar();
-  const router = useTransitionRouter();
+  const router = useRouter();
 
   const onLogout = () => {
     authClient.signOut({

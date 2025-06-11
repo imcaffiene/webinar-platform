@@ -1,6 +1,6 @@
 'use client';
 
-import SpotlightLogo from '@/components/common/SpotlightLogo';
+import SpotlightLogo from '@/components/icons/SpotlightLogo';
 import { Alert, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -11,10 +11,10 @@ import { OctagonAlertIcon } from 'lucide-react';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { Link } from 'next-view-transitions';
 import { authClient } from '@/lib/auth-client';
-import { useTransitionRouter } from 'next-view-transitions';
 import { FaGoogle, FaGithub } from "react-icons/fa";
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 
 
@@ -27,7 +27,7 @@ const formSchema = z.object({
 
 const SignInView = () => {
 
-  const router = useTransitionRouter();
+  const router = useRouter();
 
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);

@@ -1,22 +1,22 @@
-import React from 'react';
-import { XCircle, AlertTriangle, Zap, Skull, Frown } from 'lucide-react';
+import React, { useState } from 'react';
+import { AlertTriangle, X, Zap, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ErrorProps {
   className?: string;
   variant?: 'orbital' | 'matrix' | 'ripple' | 'particles';
   message?: string;
-  title?: string;
   size?: 'sm' | 'md' | 'lg';
 }
 
-const ErrorDisplay: React.FC<ErrorProps> = ({
+const Error: React.FC<ErrorProps> = ({
   className,
   variant = 'orbital',
-  message = 'Something went wrong',
-  title = 'Error',
+  message = 'An error occurred',
   size = 'md'
 }) => {
+  const [isHovered, setIsHovered] = useState(false);
+
   const sizeClasses = {
     sm: 'h-16 w-16',
     md: 'h-24 w-24',
@@ -33,28 +33,28 @@ const ErrorDisplay: React.FC<ErrorProps> = ({
     return (
       <div className={cn("flex flex-col items-center justify-center space-y-4", className)}>
         <div className={cn("relative flex items-center justify-center", containerSize[size])}>
-          {/* Central error icon */}
+          {/* Central core */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <XCircle className="w-8 h-8 text-destructive animate-pulse" />
+            <div className="w-3 h-3 bg-destructive rounded-full animate-pulse shadow-lg shadow-destructive/50" />
           </div>
 
-          {/* Cracked ring */}
-          <div className="absolute inset-2 border-2 border-destructive/30 rounded-full" />
-          <div className="absolute inset-2 border-t-2 border-destructive/80 animate-pulse"
-            style={{ transform: 'rotate(45deg)', width: '110%' }} />
+          {/* Orbital rings */}
+          <div className="absolute inset-2 border-2 border-destructive/30 rounded-full animate-spin" style={{ animationDuration: '3s' }} />
+          <div className="absolute inset-4 border-2 border-destructive/20 rounded-full animate-spin" style={{ animationDuration: '2s', animationDirection: 'reverse' }} />
 
-          {/* Shattered particles */}
-          <div className="absolute -top-1 left-1/3 w-1.5 h-1.5 bg-destructive rounded-full animate-bounce" />
-          <div className="absolute top-1/4 right-0 w-1.5 h-1.5 bg-destructive rounded-full animate-bounce"
-            style={{ animationDelay: '0.2s' }} />
-          <div className="absolute bottom-1/3 left-0 w-1.5 h-1.5 bg-destructive rounded-full animate-bounce"
-            style={{ animationDelay: '0.4s' }} />
+          {/* Orbiting particles */}
+          <div className="absolute inset-2 animate-spin" style={{ animationDuration: '3s' }}>
+            <div className="absolute -top-1 left-1/2 w-2 h-2 bg-destructive rounded-full shadow-lg shadow-destructive/50" />
+          </div>
+          <div className="absolute inset-4 animate-spin" style={{ animationDuration: '2s', animationDirection: 'reverse' }}>
+            <div className="absolute -top-1 left-1/2 w-1.5 h-1.5 bg-red-500 rounded-full" />
+          </div>
 
-          {/* Error glow */}
-          <div className="absolute inset-0 rounded-full bg-destructive/10 animate-pulse" />
+          {/* Energy waves */}
+          <div className="absolute inset-0 rounded-full bg-destructive/10 animate-ping" />
+          <div className="absolute inset-1 rounded-full bg-destructive/5 animate-ping" style={{ animationDelay: '0.5s' }} />
         </div>
-        {title && <span className="text-destructive font-medium">{title}</span>}
-        {message && <span className="text-muted-foreground text-center max-w-xs">{message}</span>}
+        {message && <span className="text-destructive animate-pulse">{message}</span>}
       </div>
     );
   }
@@ -63,29 +63,25 @@ const ErrorDisplay: React.FC<ErrorProps> = ({
     return (
       <div className={cn("flex flex-col items-center justify-center space-y-4", className)}>
         <div className={cn("relative grid grid-cols-3 gap-1", containerSize[size])}>
-          {/* Error grid */}
           {Array.from({ length: 9 }).map((_, i) => (
             <div
               key={i}
               className={cn(
-                i === 4 ? "bg-destructive" : "bg-destructive/20",
-                "rounded-sm",
+                "bg-destructive rounded-sm animate-pulse",
                 size === 'sm' ? 'h-1.5 w-1.5' : size === 'md' ? 'h-2 w-2' : 'h-3 w-3'
               )}
+              style={{
+                animationDelay: `${i * 0.1}s`,
+                animationDuration: '1.5s'
+              }}
             />
           ))}
 
-          {/* Error cross */}
-          <div
-            className="absolute inset-0 flex items-center justify-center"
-            style={{
-              background: `linear-gradient(45deg, transparent 45%, rgba(220, 38, 38, 0.8) 45%, rgba(220, 38, 38, 0.8) 55%, transparent 55%),
-                           linear-gradient(-45deg, transparent 45%, rgba(220, 38, 38, 0.8) 45%, rgba(220, 38, 38, 0.8) 55%, transparent 55%)`
-            }}
-          />
+          {/* Error scanning line */}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-destructive/30 to-transparent h-full w-full animate-pulse"
+            style={{ animationDuration: '2s' }} />
         </div>
-        {title && <span className="text-destructive font-mono font-medium">{title}</span>}
-        {message && <span className="text-muted-foreground font-mono text-center max-w-xs">{message}</span>}
+        {message && <span className="text-destructive font-mono">{message}</span>}
       </div>
     );
   }
@@ -95,25 +91,24 @@ const ErrorDisplay: React.FC<ErrorProps> = ({
       <div className={cn("flex flex-col items-center justify-center space-y-4", className)}>
         <div className={cn("relative flex items-center justify-center", containerSize[size])}>
           {/* Central icon */}
-          <AlertTriangle className="w-8 h-8 text-destructive z-10" />
+          <AlertTriangle className="w-6 h-6 text-destructive animate-pulse z-10" />
 
           {/* Ripple waves */}
-          {Array.from({ length: 3 }).map((_, i) => (
+          {Array.from({ length: 4 }).map((_, i) => (
             <div
               key={i}
-              className="absolute inset-0 border-2 border-destructive/20 rounded-full"
+              className="absolute inset-0 border-2 border-destructive/20 rounded-full animate-ping"
               style={{
-                transform: `scale(${1 + i * 0.3})`,
-                opacity: 1 - i * 0.3
+                animationDelay: `${i * 0.5}s`,
+                animationDuration: '2s'
               }}
             />
           ))}
 
-          {/* Pulsing effect */}
-          <div className="absolute inset-0 border-2 border-destructive/50 rounded-full animate-ping" />
+          {/* Background glow */}
+          <div className="absolute inset-2 bg-destructive/10 rounded-full blur-lg animate-pulse" />
         </div>
-        {title && <span className="text-destructive font-medium">{title}</span>}
-        {message && <span className="text-muted-foreground text-center max-w-xs">{message}</span>}
+        {message && <span className="text-destructive">{message}</span>}
       </div>
     );
   }
@@ -122,44 +117,46 @@ const ErrorDisplay: React.FC<ErrorProps> = ({
     return (
       <div className={cn("flex flex-col items-center justify-center space-y-4", className)}>
         <div className={cn("relative flex items-center justify-center", containerSize[size])}>
-          {/* Central skull */}
-          <Skull className="w-10 h-10 text-destructive z-10" />
+          {/* Central error icon */}
+          <X className="w-8 h-8 text-destructive animate-spin z-10" style={{ animationDuration: '3s' }} />
 
-          {/* Exploding particles */}
-          {Array.from({ length: 8 }).map((_, i) => (
+          {/* Floating particles */}
+          {Array.from({ length: 6 }).map((_, i) => (
             <div
               key={i}
-              className="absolute w-2 h-2 bg-destructive rounded-full"
+              className="absolute w-1 h-1 bg-destructive rounded-full animate-bounce"
               style={{
-                top: `${50 + Math.sin(i * Math.PI / 4) * 40}%`,
-                left: `${50 + Math.cos(i * Math.PI / 4) * 40}%`,
-                animation: `explode 0.5s ease-out ${i * 0.1}s forwards`
+                top: `${20 + Math.sin(i * Math.PI / 3) * 30}%`,
+                left: `${50 + Math.cos(i * Math.PI / 3) * 30}%`,
+                animationDelay: `${i * 0.2}s`,
+                animationDuration: '1.5s'
               }}
             />
           ))}
 
-          {/* Static electricity */}
-          <Zap className="absolute top-0 left-1/2 w-3 h-3 text-yellow-500 animate-pulse transform -translate-x-1/2" />
-          <Zap className="absolute bottom-0 left-1/2 w-3 h-3 text-yellow-500 animate-pulse transform -translate-x-1/2 rotate-180"
-            style={{ animationDelay: '0.3s' }} />
+          {/* Error burst */}
+          <div className="absolute inset-0">
+            <Zap className="absolute top-0 left-1/2 w-3 h-3 text-red-500 animate-pulse transform -translate-x-1/2" />
+            <Zap className="absolute bottom-0 left-1/2 w-3 h-3 text-red-500 animate-pulse transform -translate-x-1/2 rotate-180" style={{ animationDelay: '0.5s' }} />
+            <Zap className="absolute left-0 top-1/2 w-3 h-3 text-red-500 animate-pulse transform -translate-y-1/2 rotate-90" style={{ animationDelay: '1s' }} />
+            <Zap className="absolute right-0 top-1/2 w-3 h-3 text-red-500 animate-pulse transform -translate-y-1/2 -rotate-90" style={{ animationDelay: '1.5s' }} />
+          </div>
+
+          {/* Outer glow ring */}
+          <div className="absolute inset-0 border border-destructive/30 rounded-full animate-spin" style={{ animationDuration: '4s' }} />
         </div>
-        {title && <span className="text-destructive font-medium">{title}</span>}
-        {message && <span className="text-muted-foreground text-center max-w-xs">{message}</span>}
+        {message && <span className="text-destructive animate-pulse">{message}</span>}
       </div>
     );
   }
 
   // Default fallback
   return (
-    <div className={cn("flex flex-col items-center justify-center space-y-3", className)}>
-      <div className="relative">
-        <XCircle className={cn("text-destructive", sizeClasses[size])} />
-        <div className="absolute inset-0 rounded-full bg-destructive/10 animate-ping" />
-      </div>
-      {title && <span className="text-destructive font-medium">{title}</span>}
-      {message && <span className="text-muted-foreground text-center max-w-xs">{message}</span>}
+    <div className={cn("flex items-center justify-center space-x-3", className)}>
+      <AlertTriangle className={cn("animate-pulse text-destructive", sizeClasses[size])} />
+      {message && <span className="text-destructive">{message}</span>}
     </div>
   );
 };
 
-export default ErrorDisplay;
+export default Error;
