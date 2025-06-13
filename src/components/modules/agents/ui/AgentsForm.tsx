@@ -9,7 +9,7 @@ import { GeneratedAvatar } from '@/components/generated-avatar';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 type Props = {
   onSuccess?: () => void;
@@ -20,7 +20,6 @@ type Props = {
 const AgentsForm = ({ initialValues, onCancel, onSuccess }: Props) => {
 
   const trpc = useTRPC();
-  const router = useRouter();
   const queryClient = useQueryClient();
 
   const createAgents = useMutation(
@@ -29,9 +28,17 @@ const AgentsForm = ({ initialValues, onCancel, onSuccess }: Props) => {
         await queryClient.invalidateQueries(
           trpc.agents.getMany.queryOptions()
         );
+
+        if (initialValues?.id) {
+          await queryClient.invalidateQueries(
+            trpc.agents.getOne.queryOptions({ id: initialValues.id })
+          );
+        }
         onSuccess?.();
       },
-      onError: () => { }
+      onError: (err) => {
+        toast.error(err.message);
+      }
     })
   );
 

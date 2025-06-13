@@ -72,14 +72,26 @@ model Verification {
 }
 
 model Agent {
-  id           String   @id @default(nanoid())
-  name         String   @db.VarChar(255)
-  instructions String   @db.Text
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @default(now())
+  id           String    @id @default(nanoid())
+  name         String    @db.VarChar(255)
+  instructions String    @db.Text
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @default(now())
   userId       String
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  meeting      Meeting[]
 
   @@index([userId])
   @@map("agents")
+}
+
+model Meeting {
+  id        String   @id @default(nanoid())
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  agentId   String
+  agent     Agent    @relation(fields: [agentId], references: [id])
+
+  @@map("meetings")
 }

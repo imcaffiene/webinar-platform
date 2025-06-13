@@ -1,10 +1,36 @@
 import { prisma } from "@/lib/prisma";
-import { baseProcedure, protectedProcedure } from "@/trpc/init";
+import { protectedProcedure } from "@/trpc/init";
 import { agentInsertSchema } from "../schema/schema";
 import { TRPCError } from "@trpc/server";
+import { z } from "zod";
 
 export const agentsRouter = {
-  getMany: baseProcedure.query(async () => {
+  getOne: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ input }) => {
+      const [existingAgent] = await prisma.agent.findMany({
+        where: {
+          id: input.id,
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+          // _count: {
+          //   select: {
+          //     meetings: true,
+          //   },
+          // },
+        },
+      });
+      return existingAgent;
+    }),
+
+  getMany: protectedProcedure.query(async () => {
     const data = await prisma.agent.findMany({
       include: {
         user: {
@@ -14,6 +40,11 @@ export const agentsRouter = {
             email: true,
           },
         },
+        // _count: {
+        //   select: {
+        //     meetings: true,
+        //   },
+        // },
       },
       orderBy: {
         createdAt: "desc",
