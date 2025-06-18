@@ -2,7 +2,7 @@ import ResponsiveDailog from '@/components/common/ResponsiveDailog';
 import React from 'react';
 import AgentsForm from './AgentsForm';
 
-type Props = {
+interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 };

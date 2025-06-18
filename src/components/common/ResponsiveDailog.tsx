@@ -9,7 +9,7 @@ type Props = {
   title: string;
   description: string;
   open: boolean;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   onOpenChange: (open: boolean) => void;
 };
 

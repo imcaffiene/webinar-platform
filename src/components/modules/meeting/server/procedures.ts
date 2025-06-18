@@ -1,6 +1,5 @@
 import { prisma } from "@/lib/prisma";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
-import { agentInsertSchema, agentUpdateSchema } from "../schema/schema";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import {
@@ -10,12 +9,13 @@ import {
   MIN_PAGE_SIZE,
 } from "@/lib/constant";
 import { Prisma } from "@prisma/client";
+import { meetingInsertSchema, meetingUpdateSchema } from "../schema/schema";
 
-export const agentsRouter = createTRPCRouter({
+export const meetingsRouter = createTRPCRouter({
   getOne: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ input, ctx }) => {
-      const agent = await prisma.agent.findFirst({
+      const existingMeeting = await prisma.meeting.findFirst({
         where: {
           id: input.id,
           userId: ctx.auth.user.id,
@@ -28,16 +28,22 @@ export const agentsRouter = createTRPCRouter({
               email: true,
             },
           },
+          agent: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
         },
       });
 
-      if (!agent) {
+      if (!existingMeeting) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: "Agent not found",
+          message: "meeting not found",
         });
       }
-      return agent;
+      return existingMeeting;
     }),
 
   getMany: protectedProcedure
@@ -55,15 +61,13 @@ export const agentsRouter = createTRPCRouter({
     .query(async ({ input, ctx }) => {
       const { page, pageSize, search } = input;
 
-      const where = {
+      const where: Prisma.MeetingWhereInput = {
         userId: ctx.auth.user.id,
-        name: search
-          ? { contains: search, mode: Prisma.QueryMode.insensitive }
-          : undefined,
+        name: search ? { contains: search, mode: "insensitive" } : undefined,
       };
 
       const [items, total] = await Promise.all([
-        prisma.agent.findMany({
+        prisma.meeting.findMany({
           where,
           include: {
             user: {
@@ -73,12 +77,18 @@ export const agentsRouter = createTRPCRouter({
                 email: true,
               },
             },
+            agent: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
           },
           orderBy: [{ createdAt: "desc" }, { id: "desc" }],
           skip: (page - 1) * pageSize,
           take: pageSize,
         }),
-        prisma.agent.count({ where }),
+        prisma.meeting.count({ where }),
       ]);
 
       return {
@@ -89,13 +99,28 @@ export const agentsRouter = createTRPCRouter({
     }),
 
   create: protectedProcedure
-    .input(agentInsertSchema)
+    .input(meetingInsertSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        return await prisma.agent.create({
+        // Verify agent belongs to user
+        const agent = await prisma.agent.findFirst({
+          where: {
+            id: input.agentId,
+            userId: ctx.auth.user.id,
+          },
+        });
+
+        if (!agent) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Agent not found or you don't have permission",
+          });
+        }
+
+        return await prisma.meeting.create({
           data: {
             name: input.name,
-            instructions: input.instructions,
+            agentId: input.agentId,
             userId: ctx.auth.user.id,
           },
           include: {
@@ -106,23 +131,28 @@ export const agentsRouter = createTRPCRouter({
                 email: true,
               },
             },
+            agent: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
           },
         });
       } catch (error) {
-        console.error("Agent creation failed:", error);
+        console.error("Meeting creation failed:", error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to create agent",
+          message: "Failed to create meeting",
         });
       }
     }),
 
   update: protectedProcedure
-    .input(agentUpdateSchema)
+    .input(meetingUpdateSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        // Verify ownership first
-        const existing = await prisma.agent.findFirst({
+        const existing = await prisma.meeting.findFirst({
           where: {
             id: input.id,
             userId: ctx.auth.user.id,
@@ -132,19 +162,29 @@ export const agentsRouter = createTRPCRouter({
         if (!existing) {
           throw new TRPCError({
             code: "NOT_FOUND",
-            message: "Agent not found",
+            message: "Meeting not found",
           });
         }
 
-        return await prisma.agent.update({
+        return await prisma.meeting.update({
           where: { id: input.id },
-          data: input,
+          data: {
+            ...input,
+            userId: undefined,
+            agentId: undefined,
+          },
           include: {
             user: {
               select: {
                 id: true,
                 name: true,
                 email: true,
+              },
+            },
+            agent: {
+              select: {
+                id: true,
+                name: true,
               },
             },
           },
@@ -154,57 +194,13 @@ export const agentsRouter = createTRPCRouter({
           if (error.code === "P2025") {
             throw new TRPCError({
               code: "NOT_FOUND",
-              message: "Agent not found",
+              message: "Meeting not found",
             });
           }
         }
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to update agent",
-        });
-      }
-    }),
-
-  remove: protectedProcedure
-    .input(z.object({ id: z.string() }))
-    .mutation(async ({ input, ctx }) => {
-      try {
-        // Get agent first to return data
-        const agent = await prisma.agent.findFirst({
-          where: {
-            id: input.id,
-            userId: ctx.auth.user.id,
-          },
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-              },
-            },
-          },
-        });
-
-        if (!agent) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "Agent not found",
-          });
-        }
-
-        await prisma.agent.deleteMany({
-          where: {
-            id: input.id,
-            userId: ctx.auth.user.id,
-          },
-        });
-
-        return agent;
-      } catch (error) {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to delete agent",
+          message: "Failed to update meeting",
         });
       }
     }),
