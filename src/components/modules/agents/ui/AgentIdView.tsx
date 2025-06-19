@@ -13,7 +13,7 @@ import { VideoIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import UseConfirm from '@/hooks/use-confirm';
-import UpdateAgentsDailogs from './UpdateAgentDialog';
+import UpdateAgentsDialogs from './UpdateAgentDialog';
 
 interface Props {
   agentId: string;
@@ -25,7 +25,7 @@ const AgentIdView = ({ agentId }: Props) => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
-  const [updateAgentsDailogsOpen, setUpdateAgentsDailogsOpen] = useState(false);
+  const [updateAgentsDialogsOpen, setUpdateAgentsDialogsOpen] = useState(false);
 
   const { data } = useSuspenseQuery(trpc.agents.getOne.queryOptions({ id: agentId }));
 
@@ -56,16 +56,16 @@ const AgentIdView = ({ agentId }: Props) => {
   return (
     <>
       <RemoveConfirmation />
-      <UpdateAgentsDailogs
-        open={updateAgentsDailogsOpen}
-        onOpenChange={setUpdateAgentsDailogsOpen}
+      <UpdateAgentsDialogs
+        open={updateAgentsDialogsOpen}
+        onOpenChange={setUpdateAgentsDialogsOpen}
         initialValues={data}
       />
       <div className='flex-1 py-4 px-4 md:px-8 flex flex-col gap-y-4'>
         <AgentIdViewHeader
           agentId={agentId}
           agentName={data.name}
-          onEdit={() => setUpdateAgentsDailogsOpen(true)}
+          onEdit={() => setUpdateAgentsDialogsOpen(true)}
           onRemove={handleRemoveAgent}
         />
 

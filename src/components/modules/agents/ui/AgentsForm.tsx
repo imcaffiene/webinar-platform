@@ -5,11 +5,11 @@ import { agentInsertSchema } from '../schema/schema';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
-import { GeneratedAvatar } from '@/components/generated-avatar';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { GeneratedAvatar } from '@/components/common/generated-avatar';
 
 interface Props {
   onSuccess?: () => void;

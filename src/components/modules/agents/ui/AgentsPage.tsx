@@ -5,11 +5,11 @@ import Loading from '@/components/common/LoadingState';
 import { useTRPC } from '@/trpc/client';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import React from 'react';
-import { DataTable } from './data-table';
+import { DataTable } from '../../../common/data-table';
 import { columns } from './columns';
 import EmptyState from '@/components/common/EmptyState';
-import { useAgentsFilter } from '@/hooks/use-agents-filter';
-import DataPagination from './DataPagination';
+import { useAgentsFilter } from '@/hooks/use-filter';
+import DataPagination from '../../../common/DataPagination';
 import { useRouter } from 'next/navigation';
 
 

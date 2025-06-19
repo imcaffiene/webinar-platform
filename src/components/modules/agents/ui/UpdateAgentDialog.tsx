@@ -9,7 +9,7 @@ interface Props {
   initialValues: AgentGetOne;
 };
 
-const UpdateAgentsDailogs = ({ onOpenChange, open, initialValues }: Props) => {
+const UpdateAgentsDialogs = ({ onOpenChange, open, initialValues }: Props) => {
 
   return (
 
@@ -28,4 +28,4 @@ const UpdateAgentsDailogs = ({ onOpenChange, open, initialValues }: Props) => {
   );
 };
 
-export default UpdateAgentsDailogs;
+export default UpdateAgentsDialogs;

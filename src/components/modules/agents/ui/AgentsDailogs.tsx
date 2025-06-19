@@ -7,7 +7,7 @@ interface Props {
   onOpenChange: (open: boolean) => void;
 };
 
-const AgentsDailogs = ({ onOpenChange, open }: Props) => {
+const AgentsDialogs = ({ onOpenChange, open }: Props) => {
 
   return (
 
@@ -21,4 +21,4 @@ const AgentsDailogs = ({ onOpenChange, open }: Props) => {
   );
 };
 
-export default AgentsDailogs;
+export default AgentsDialogs;

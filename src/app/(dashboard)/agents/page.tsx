@@ -8,7 +8,7 @@ import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 import type { SearchParams } from 'nuqs';
-import { loadSearchParams } from '@/components/modules/agents/params';
+import { loadSearchParams } from '@/lib/params';
 
 type Props = {
   searchParams: Promise<SearchParams>;

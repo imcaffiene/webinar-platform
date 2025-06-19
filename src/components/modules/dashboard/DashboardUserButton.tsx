@@ -1,6 +1,6 @@
 'use client';
 
-import { GeneratedAvatar } from '@/components/generated-avatar';
+import { GeneratedAvatar } from '@/components/common/generated-avatar';
 import CreditCardIcon from '@/components/icons/CreditCardIcon';
 import LogOutIcon from '@/components/icons/LogOutIcon';
 import SparklesIcon from '@/components/icons/SparklesIcon';

@@ -10,6 +10,7 @@ import {
 } from "@/lib/constant";
 import { Prisma } from "@prisma/client";
 import { meetingInsertSchema, meetingUpdateSchema } from "../schema/schema";
+import { MeetingStatus } from "@/lib/types";
 
 export const meetingsRouter = createTRPCRouter({
   getOne: protectedProcedure
@@ -56,14 +57,26 @@ export const meetingsRouter = createTRPCRouter({
           .max(MAX_PAGE_SIZE)
           .default(DEFAULT_PAGE_SIZE),
         search: z.string().nullish(),
+        agentId: z.string().nullish(),
+        status: z
+          .enum([
+            MeetingStatus.Upcoming,
+            MeetingStatus.Active,
+            MeetingStatus.Cancelled,
+            MeetingStatus.Completed,
+            MeetingStatus.Processing,
+          ])
+          .nullish(),
       })
     )
     .query(async ({ input, ctx }) => {
-      const { page, pageSize, search } = input;
+      const { page, pageSize, search, agentId, status } = input;
 
       const where: Prisma.MeetingWhereInput = {
         userId: ctx.auth.user.id,
         name: search ? { contains: search, mode: "insensitive" } : undefined,
+        status: status ? status : undefined,
+        agentId: agentId ? agentId : undefined,
       };
 
       const [items, total] = await Promise.all([
@@ -88,11 +101,29 @@ export const meetingsRouter = createTRPCRouter({
           skip: (page - 1) * pageSize,
           take: pageSize,
         }),
-        prisma.meeting.count({ where }),
+        prisma.meeting.count({
+          where: {
+            userId: ctx.auth.user.id,
+            name: search
+              ? { contains: search, mode: "insensitive" }
+              : undefined,
+            status: status ? status : undefined,
+            agent: agentId ? { id: agentId } : undefined,
+          },
+        }),
       ]);
 
+      // Calculate duration for each meeting
+      const itemsWithDuration = items.map((meeting) => ({
+        ...meeting,
+        duration:
+          meeting.endedAt && meeting.startedAt
+            ? (meeting.endedAt.getTime() - meeting.startedAt.getTime()) / 1000 // Convert to seconds
+            : null,
+      }));
+
       return {
-        items,
+        items: itemsWithDuration,
         total,
         totalPages: Math.ceil(total / pageSize),
       };
