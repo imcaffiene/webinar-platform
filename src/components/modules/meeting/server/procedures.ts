@@ -29,12 +29,7 @@ export const meetingsRouter = createTRPCRouter({
               email: true,
             },
           },
-          agent: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
+          agent: true,
         },
       });
 
@@ -44,7 +39,19 @@ export const meetingsRouter = createTRPCRouter({
           message: "meeting not found",
         });
       }
-      return existingMeeting;
+
+      const duration =
+        existingMeeting.endedAt && existingMeeting.startedAt
+          ? (existingMeeting.endedAt.getTime() -
+              existingMeeting.startedAt.getTime()) /
+            1000
+          : null;
+
+      return {
+        ...existingMeeting,
+        duration,
+        agent: existingMeeting.agent,
+      };
     }),
 
   getMany: protectedProcedure
@@ -118,7 +125,7 @@ export const meetingsRouter = createTRPCRouter({
         ...meeting,
         duration:
           meeting.endedAt && meeting.startedAt
-            ? (meeting.endedAt.getTime() - meeting.startedAt.getTime()) / 1000 // Convert to seconds
+            ? (meeting.endedAt.getTime() - meeting.startedAt.getTime()) / 1000
             : null,
       }));
 
@@ -232,6 +239,63 @@ export const meetingsRouter = createTRPCRouter({
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to update meeting",
+        });
+      }
+    }),
+  remove: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const meetingToDelete = await prisma.meeting.findFirst({
+          where: {
+            id: input.id,
+            userId: ctx.auth.user.id,
+          },
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+            agent: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        });
+
+        if (!meetingToDelete) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Meeting not found or you don't have permission",
+          });
+        }
+
+        // Then delete it
+        await prisma.meeting.deleteMany({
+          where: {
+            id: input.id,
+            userId: ctx.auth.user.id, // Ensures ownership
+          },
+        });
+
+        return meetingToDelete; // Return the deleted meeting data
+      } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+          if (error.code === "P2025") {
+            throw new TRPCError({
+              code: "NOT_FOUND",
+              message: "Meeting not found",
+            });
+          }
+        }
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to delete meeting",
         });
       }
     }),

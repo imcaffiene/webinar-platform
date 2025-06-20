@@ -1,8 +1,9 @@
 import MeetingHeaders from '@/components/modules/meeting/ui/MeetingHeaders';
 import {
   MeetingPage,
-  MeetingsViewError,
-  MeetingsViewLoading
+  MeetingsErrorState,
+  MeetingsLoadingState,
+
 } from '@/components/modules/meeting/ui/MeetingPage';
 import { auth } from '@/lib/auth';
 import { loadSearchParams, MeetingloadSearchParams } from '@/lib/params';
@@ -39,8 +40,8 @@ const page = async ({ searchparams }: Props) => {
     <>
       <MeetingHeaders />
       <HydrationBoundary state={dehydrate(queryClient)}>
-        <Suspense fallback={<MeetingsViewLoading />}>
-          <ErrorBoundary fallback={<MeetingsViewError />}>
+        <Suspense fallback={<MeetingsLoadingState />}>
+          <ErrorBoundary fallback={<MeetingsErrorState />}>
             <MeetingPage />
           </ErrorBoundary>
         </Suspense>

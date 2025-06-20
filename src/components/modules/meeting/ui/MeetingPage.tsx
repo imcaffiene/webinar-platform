@@ -48,7 +48,7 @@ export const MeetingPage = () => {
 
 
 
-export const MeetingsViewLoading = () => {
+export const MeetingsLoadingState = () => {
 
   return (
     <Loading
@@ -59,7 +59,7 @@ export const MeetingsViewLoading = () => {
   );
 };
 
-export const MeetingsViewError = () => {
+export const MeetingsErrorState = () => {
   return (
     <Error
       message='Failed to load meetings. Please try again later.'

@@ -7,13 +7,13 @@ import { useTRPC } from '@/trpc/client';
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import React, { useState } from 'react';
 import AgentIdViewHeader from './AgentIdViewHeader';
-import { GeneratedAvatar } from '@/components/generated-avatar';
 import { Badge } from '@/components/ui/badge';
 import { VideoIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import UseConfirm from '@/hooks/use-confirm';
 import UpdateAgentsDialogs from './UpdateAgentDialog';
+import { GeneratedAvatar } from '@/components/common/generated-avatar';
 
 interface Props {
   agentId: string;
