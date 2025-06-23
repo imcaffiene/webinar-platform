@@ -11,8 +11,43 @@ import {
 import { Prisma } from "@prisma/client";
 import { meetingInsertSchema, meetingUpdateSchema } from "../schema/schema";
 import { MeetingStatus } from "@/lib/types";
+import { streamVideo } from "@/lib/stream-video";
+import { GeneratedAvatarUri } from "@/lib/avatar";
 
 export const meetingsRouter = createTRPCRouter({
+  generateToken: protectedProcedure.mutation(async ({ ctx }) => {
+    const user = await prisma.user.findUnique({
+      where: { id: ctx.auth.user.id },
+      select: { id: true, name: true, email: true },
+    });
+    if (!user) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "User not found",
+      });
+    }
+
+    await streamVideo.upsertUsers([
+      {
+        id: ctx.auth.user.id,
+        name: ctx.auth.user.name,
+        role: "admin",
+        image:
+          ctx.auth.user.image ??
+          GeneratedAvatarUri({ seed: ctx.auth.user.name, variant: "initials" }),
+      },
+    ]);
+
+    const expirationTime = Math.floor(Date.now() / 1000) + 3600; // 1 hour from now
+    const issuedAt = Math.floor(Date.now() / 1000) - 60;
+
+    const token = streamVideo.generateUserToken({
+      user_id: ctx.auth.user.id,
+      exp: expirationTime,
+      validity_in_seconds: issuedAt,
+    });
+    return token;
+  }),
   getOne: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ input, ctx }) => {
@@ -155,7 +190,31 @@ export const meetingsRouter = createTRPCRouter({
           });
         }
 
-        return await prisma.meeting.create({
+        // Upsert both user and agent to Stream Video
+        await streamVideo.upsertUsers([
+          {
+            id: ctx.auth.user.id,
+            name: ctx.auth.user.name || "User",
+            role: "user",
+            image:
+              ctx.auth.user.image ||
+              GeneratedAvatarUri({
+                seed: ctx.auth.user.id,
+                variant: "initials",
+              }),
+          },
+          {
+            id: agent.id,
+            name: agent.name,
+            role: "user",
+            image: GeneratedAvatarUri({
+              seed: agent.name,
+              variant: "botttsNeutral",
+            }),
+          },
+        ]);
+
+        const createdMeeting = await prisma.meeting.create({
           data: {
             name: input.name,
             agentId: input.agentId,
@@ -177,6 +236,36 @@ export const meetingsRouter = createTRPCRouter({
             },
           },
         });
+
+        // Create Stream Video call
+        const call = streamVideo.video.call("default", createdMeeting.id);
+        await call.create({
+          data: {
+            created_by_id: ctx.auth.user.id,
+            members: [
+              { user_id: ctx.auth.user.id, role: "admin" },
+              { user_id: agent.id, role: "user" },
+            ],
+            custom: {
+              meetingId: createdMeeting.id,
+              meetingName: createdMeeting.name,
+              agentId: agent.id,
+            },
+            settings_override: {
+              transcription: {
+                language: "en",
+                mode: "auto-on",
+                closed_caption_mode: "auto-on",
+              },
+              recording: {
+                mode: "auto-on",
+                quality: "1080p",
+              },
+            },
+          },
+        });
+
+        return createdMeeting;
       } catch (error) {
         console.error("Meeting creation failed:", error);
         throw new TRPCError({
