@@ -1,6 +1,6 @@
 "use client";
 
-import { GeneratedAvatar } from "@/components/generated-avatar";
+import { GeneratedAvatar } from "@/components/common/generated-avatar";
 import { Badge } from "@/components/ui/badge";
 import { AgentGetMany } from "@/lib/types";
 import { ColumnDef } from "@tanstack/react-table";

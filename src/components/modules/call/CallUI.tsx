@@ -5,6 +5,7 @@ import {
 import React, { useState } from 'react';
 import { CallLobby } from './CallLobby';
 import { CallActive } from './CallActive';
+import { CallEnded } from './CallEnded';
 
 interface Props {
   meetingName: string;
@@ -37,7 +38,7 @@ export const CallUI = ({ meetingName }: Props) => {
     <StreamTheme className='h-full'>
       {show === "lobby" && <CallLobby onJoin={handleJoin} />}
       {show === "call" && <CallActive onLeave={handleLeave} meetingName={meetingName} />}
-      {show === "ended" && <p>Call Ended</p>}
+      {show === "ended" && <CallEnded />}
     </StreamTheme>
   );
 };

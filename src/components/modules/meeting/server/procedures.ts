@@ -13,6 +13,7 @@ import { meetingInsertSchema, meetingUpdateSchema } from "../schema/schema";
 import { MeetingStatus } from "@/lib/types";
 import { streamVideo } from "@/lib/stream-video";
 import { GeneratedAvatarUri } from "@/lib/avatar";
+import { inngest } from "@/inngest/client";
 
 export const meetingsRouter = createTRPCRouter({
   generateToken: protectedProcedure.mutation(async ({ ctx }) => {

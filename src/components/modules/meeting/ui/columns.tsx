@@ -11,19 +11,11 @@ import {
   CornerDownRightIcon,
   Loader,
 } from "lucide-react";
-import humanizeDuration from "humanize-duration";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
+import { cn, formatDuration } from "@/lib/utils";
 import { GeneratedAvatar } from "@/components/common/generated-avatar";
 
 
-function formatDuration(seconds: number) {
-  return humanizeDuration(seconds * 1000, {
-    largest: 1,
-    round: true,
-    units: ["h", "m", "s"],
-  });
-}
 
 const statusIconMap = {
   upcoming: ClockArrowUp,

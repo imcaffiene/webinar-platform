@@ -1,7 +1,14 @@
 import { Button } from '@/components/ui/button';
 import { authClient } from '@/lib/auth-client';
 import { GeneratedAvatarUri } from '@/lib/avatar';
-import { DefaultVideoPlaceholder, StreamVideoParticipant, ToggleAudioPreviewButton, ToggleVideoPreviewButton, useCallStateHooks, VideoPreview } from '@stream-io/video-react-sdk';
+import {
+  DefaultVideoPlaceholder,
+  StreamVideoParticipant,
+  ToggleAudioPreviewButton,
+  ToggleVideoPreviewButton,
+  useCallStateHooks,
+  VideoPreview
+} from '@stream-io/video-react-sdk';
 import { LogIn } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react';
