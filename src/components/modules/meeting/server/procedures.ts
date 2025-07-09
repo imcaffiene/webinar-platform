@@ -10,12 +10,127 @@ import {
 } from "@/lib/constant";
 import { Prisma } from "@prisma/client";
 import { meetingInsertSchema, meetingUpdateSchema } from "../schema/schema";
-import { MeetingStatus } from "@/lib/types";
+import { MeetingStatus, SteamTranscriptItem } from "@/lib/types";
 import { streamVideo } from "@/lib/stream-video";
 import { GeneratedAvatarUri } from "@/lib/avatar";
-import { inngest } from "@/inngest/client";
+import JSONL from "jsonl-parse-stringify";
+import { streamChat } from "@/lib/stream-chat";
 
 export const meetingsRouter = createTRPCRouter({
+  generateChatToken: protectedProcedure.mutation(async ({ ctx }) => {
+    const token = streamChat.createToken(ctx.auth.user.id);
+    await streamChat.upsertUsers([
+      {
+        id: ctx.auth.user.id,
+        role: "admin",
+      },
+    ]);
+    return token;
+  }),
+
+  getTranscript: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const existingMeeting = await prisma.meeting.findFirst({
+        where: {
+          id: input.id,
+          userId: ctx.auth.user.id,
+        },
+        select: {
+          id: true,
+          transcriptUrl: true,
+        },
+      });
+
+      if (!existingMeeting) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Meeting not found",
+        });
+      }
+
+      if (!existingMeeting.transcriptUrl) {
+        return [];
+      }
+
+      const transcript = await fetch(existingMeeting.transcriptUrl)
+        .then((res) => res.text())
+        .then((text) => JSONL.parse<SteamTranscriptItem>(text))
+        .catch(() => {
+          return [];
+        });
+
+      const speakerIds = [
+        ...new Set(transcript.map((item) => item.speaker_id)),
+      ];
+
+      const userSpeakers = await prisma.user
+        .findMany({
+          where: {
+            id: {
+              in: speakerIds,
+            },
+          },
+        })
+        .then((users) =>
+          users.map((user) => ({
+            ...user,
+            image:
+              user.image ??
+              GeneratedAvatarUri({ seed: user.name, variant: "initials" }),
+          }))
+        );
+
+      const agentspeakers = await prisma.agent
+        .findMany({
+          where: {
+            id: {
+              in: speakerIds,
+            },
+          },
+        })
+        .then((agents) =>
+          agents.map((agent) => ({
+            ...agent,
+            image: GeneratedAvatarUri({
+              seed: agent.name,
+              variant: "botttsNeutral",
+            }),
+          }))
+        );
+
+      const speakers = [...userSpeakers, ...agentspeakers];
+
+      const transcriptWithSpeakers = transcript.map((item) => {
+        const speaker = speakers.find(
+          (speaker) => speaker.id === item.speaker_id
+        );
+
+        if (!speaker) {
+          return {
+            ...item,
+            user: {
+              name: "Unknown",
+              image: GeneratedAvatarUri({
+                seed: "unknown",
+                variant: "initials",
+              }),
+            },
+          };
+        }
+
+        return {
+          ...item,
+          user: {
+            name: speaker.name,
+            image: speaker.image,
+          },
+        };
+      });
+
+      return transcriptWithSpeakers;
+    }),
+
   generateToken: protectedProcedure.mutation(async ({ ctx }) => {
     const user = await prisma.user.findUnique({
       where: { id: ctx.auth.user.id },
@@ -243,14 +358,14 @@ export const meetingsRouter = createTRPCRouter({
         await call.create({
           data: {
             created_by_id: ctx.auth.user.id,
-            members: [
-              { user_id: ctx.auth.user.id, role: "admin" },
-              { user_id: agent.id, role: "user" },
-            ],
+            // members: [
+            //   { user_id: ctx.auth.user.id, role: "admin" },
+            //   { user_id: agent.id, role: "user" },
+            // ],
             custom: {
               meetingId: createdMeeting.id,
               meetingName: createdMeeting.name,
-              agentId: agent.id,
+              // agentId: agent.id,
             },
             settings_override: {
               transcription: {

@@ -122,7 +122,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Converted Drizzle code to Prisma
     const meeting = await prisma.meeting.findFirst({
       where: {
         id: meetingId,
@@ -160,7 +159,7 @@ export async function POST(req: NextRequest) {
     }
 
     await inngest.send({
-      name: "meeting/processing",
+      name: "meetings/processing",
       data: {
         meetingId: updatedMeeting.id,
         transcriptUrl: updatedMeeting.transcriptUrl,
