@@ -11,6 +11,7 @@ import { usePathname } from 'next/navigation';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarHeader, SidebarMenu, SidebarMenuButton } from '@/components/ui/sidebar';
 import DashboardUserButton from './DashboardUserButton';
 import Link from 'next/link';
+import { DashboardTrail } from './DashboardTrail';
 
 
 
@@ -111,6 +112,7 @@ const DashBoardSidebar = () => {
       </SidebarContent>
 
       <SidebarFooter>
+        <DashboardTrail />
         <DashboardUserButton />
       </SidebarFooter>
     </Sidebar>

@@ -1,7 +1,7 @@
 import { useTRPC } from '@/trpc/client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
-import { set, z } from 'zod';
+import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Form,
@@ -19,6 +19,7 @@ import { useState } from 'react';
 import { CommandSelect } from '@/components/common/CommandSelect';
 import AgentsDialogs from '../../agents/ui/AgentsDailogs';
 import { GeneratedAvatar } from '@/components/common/generated-avatar';
+import { useRouter } from 'next/navigation';
 
 interface Props {
   onSuccess?: (id?: string) => void;
@@ -29,6 +30,7 @@ interface Props {
 const MeetingForm = ({ initialValues, onCancel, onSuccess }: Props) => {
 
   const trpc = useTRPC();
+  const router = useRouter();
   const queryClient = useQueryClient();
 
   const [openNewAgentDialog, setOpenNewAgentDialog] = useState(false);
@@ -47,10 +49,17 @@ const MeetingForm = ({ initialValues, onCancel, onSuccess }: Props) => {
         await queryClient.invalidateQueries(
           trpc.meetings.getMany.queryOptions({})
         );
+        await queryClient.invalidateQueries(
+          trpc.premium.getFreeUsage.queryOptions()
+        );
         onSuccess?.(data.id);
       },
       onError: (err) => {
         toast.error(err.message);
+
+        if (err.data?.code === "FORBIDDEN") {
+          router.push("/upgrade");
+        }
       }
     })
   );

@@ -1,5 +1,9 @@
 import { prisma } from "@/lib/prisma";
-import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
+import {
+  createTRPCRouter,
+  premiumProceduce,
+  protectedProcedure,
+} from "@/trpc/init";
 import { agentInsertSchema, agentUpdateSchema } from "../schema/schema";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
@@ -88,7 +92,7 @@ export const agentsRouter = createTRPCRouter({
       };
     }),
 
-  create: protectedProcedure
+  create: premiumProceduce("agents")
     .input(agentInsertSchema)
     .mutation(async ({ input, ctx }) => {
       try {
